@@ -44,13 +44,11 @@ func (r *ResultStream) Next() (core.Row, error) {
 }
 
 func (r *ResultStream) Close() {
-	r.once.Do(func() {
-		for _, fn := range r.closes {
-			if fn != nil {
-				fn()
-			}
+	for _, fn := range r.closes {
+		if fn != nil {
+			fn()
 		}
-	})
+	}
 
 	r.hasNext = func() bool {
 		return false
