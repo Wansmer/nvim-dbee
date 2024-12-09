@@ -54,6 +54,7 @@ func (c *Client) ColumnsFromQuery(query string, args ...any) ([]*core.Column, er
 	if err != nil {
 		return nil, err
 	}
+  defer result.Close()
 
 	return ColumnsFromResultStream(result)
 }

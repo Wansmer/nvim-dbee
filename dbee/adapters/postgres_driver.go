@@ -75,6 +75,7 @@ func (c *postgresDriver) ListDatabases() (current string, available []string, er
 	if err != nil {
 		return "", nil, err
 	}
+	defer rows.Close()
 
 	for rows.HasNext() {
 		row, err := rows.Next()
@@ -105,6 +106,7 @@ func (c *postgresDriver) SelectDatabase(name string) error {
 // getPGStructure fetches the layout from the postgres database.
 // rows is at least 3 column wide result
 func getPGStructure(rows core.ResultStream) ([]*core.Structure, error) {
+  defer rows.Close()
 	children := make(map[string][]*core.Structure)
 
 	for rows.HasNext() {
