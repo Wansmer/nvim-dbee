@@ -11,12 +11,17 @@ local function column_nodes(parent_id, columns)
   ---@type DrawerUINode[]
   local nodes = {}
 
+  local longest_name = vim.iter(columns):fold(0, function(a, b)
+    return math.max(a, #b.name)
+  end)
+
   for _, column in ipairs(columns) do
+    local padding = longest_name - #column.name
     table.insert(
       nodes,
       NuiTree.Node {
         id = parent_id .. column.type .. column.name,
-        name = column.name .. "   [" .. column.type .. "]",
+        name = column.name .. string.rep(" ", padding) .. " [" .. column.type .. "]",
         type = "column",
       }
     )
