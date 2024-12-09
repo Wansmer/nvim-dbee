@@ -195,16 +195,17 @@ function ResultUI:display_result(page)
     self.page_ammount = self.page_ammount - 1
   end
 
-  -- convert from microseconds to seconds
-  local seconds = self.current_call.time_taken_us / 1000000
-
   -- set winbar status
   if self:has_window() then
-    vim.api.nvim_win_set_option(
-      self.winid,
-      "winbar",
-      string.format("%d/%d (%d)%%=Took %.3fs", page + 1, self.page_ammount + 1, length, seconds)
-    )
+    vim.schedule(function()
+      -- convert from microseconds to seconds
+      local seconds = self.current_call.time_taken_us / 1000000
+      vim.api.nvim_win_set_option(
+        self.winid,
+        "winbar",
+        string.format("%d/%d (%d)%%=Took %.3fs", page + 1, self.page_ammount + 1, length, seconds)
+      )
+    end)
 
     -- set focus if window exists
     vim.api.nvim_set_current_win(self.winid)
