@@ -233,3 +233,7 @@ func (c *Call) GetResult() (*Result, error) {
 
 	return c.result, nil
 }
+
+func (c *Call) GetResultLen() (int) {
+	return c.result.Len()
+}
