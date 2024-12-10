@@ -34,6 +34,7 @@ func (eb *eventBus) CallStateChanged(call *core.Call) {
 			state = %q,
 			time_taken_us = %d,
 			timestamp_us = %d,
+			result_length = %d,
 			error = %s,
 		},
 	}`, call.GetID(),
@@ -41,6 +42,7 @@ func (eb *eventBus) CallStateChanged(call *core.Call) {
 		call.GetState().String(),
 		call.GetTimeTaken().Microseconds(),
 		call.GetTimestamp().UnixMicro(),
+		call.GetResultLen(),
 		errMsg)
 
 	eb.callLua("call_state_changed", data)
