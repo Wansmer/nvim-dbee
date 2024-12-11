@@ -32,12 +32,13 @@ type (
 
 // callPersistent is used for marshaling and unmarshaling the call
 type callPersistent struct {
-	ID        string `json:"id"`
-	Query     string `json:"query"`
-	State     string `json:"state"`
-	TimeTaken int64  `json:"time_taken_us"`
-	Timestamp int64  `json:"timestamp_us"`
-	Error     string `json:"error,omitempty"`
+	ID           string `json:"id"`
+	Query        string `json:"query"`
+	State        string `json:"state"`
+	TimeTaken    int64  `json:"time_taken_us"`
+	Timestamp    int64  `json:"timestamp_us"`
+	ResultLength int    `json:"result_length"`
+	Error        string `json:"error,omitempty"`
 }
 
 func (c *Call) toPersistent() *callPersistent {
@@ -47,12 +48,13 @@ func (c *Call) toPersistent() *callPersistent {
 	}
 
 	return &callPersistent{
-		ID:        string(c.id),
-		Query:     c.query,
-		State:     c.state.String(),
-		TimeTaken: c.timeTaken.Microseconds(),
-		Timestamp: c.timestamp.UnixMicro(),
-		Error:     errMsg,
+		ID:           string(c.id),
+		Query:        c.query,
+		State:        c.state.String(),
+		TimeTaken:    c.timeTaken.Microseconds(),
+		Timestamp:    c.timestamp.UnixMicro(),
+		ResultLength: c.GetResultLen(),
+		Error:        errMsg,
 	}
 }
 
@@ -232,4 +234,8 @@ func (c *Call) GetResult() (*Result, error) {
 	}
 
 	return c.result, nil
+}
+
+func (c *Call) GetResultLen() int {
+	return c.result.Len()
 }
