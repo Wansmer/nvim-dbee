@@ -81,6 +81,7 @@ function ResultUI:on_call_state_changed(data)
 
   -- update the current call with up to date details
   self.current_call = call
+  self:display_winbar()
 
   -- perform action based on the state
   if call.state == "executing" then
@@ -189,23 +190,9 @@ function ResultUI:display_result(page)
   -- call go function
   local length = self.handler:call_display_result(self.current_call.id, self.bufnr, from, to)
 
-  -- adjust page ammount
-  self.page_ammount = math.floor(length / self.page_size)
-  if length % self.page_size == 0 and self.page_ammount ~= 0 then
-    self.page_ammount = self.page_ammount - 1
-  end
-
-  -- set winbar status
   if self:has_window() then
-    vim.schedule(function()
-      -- convert from microseconds to seconds
-      local seconds = self.current_call.time_taken_us / 1000000
-      vim.api.nvim_win_set_option(
-        self.winid,
-        "winbar",
-        string.format("%d/%d (%d)%%=Took %.3fs", page + 1, self.page_ammount + 1, length, seconds)
-      )
-    end)
+    -- set winbar status
+    self:display_winbar(length)
 
     -- set focus if window exists
     vim.api.nvim_set_current_win(self.winid)
@@ -215,6 +202,31 @@ function ResultUI:display_result(page)
   vim.api.nvim_buf_set_option(self.bufnr, "modified", false)
 
   return page
+end
+
+--- Display metadata (pages, total rows, execution time) in the winbar
+---@param length? integer
+function ResultUI:display_winbar(length)
+  if not (self.current_call or self:has_window()) then
+    return
+  end
+  vim.schedule(function()
+    if not length then
+      length = self.current_call.result_length or 0
+    end
+    self.page_ammount = math.floor(length / self.page_size)
+    if length % self.page_size == 0 and self.page_ammount ~= 0 then
+      self.page_ammount = self.page_ammount - 1
+    end
+
+    local seconds = self.current_call.time_taken_us / 1000000
+
+    vim.api.nvim_set_option_value(
+      "winbar",
+      string.format("%d/%d (%d)%%=Took %.3fs", self.page_index + 1, self.page_ammount + 1, length, seconds),
+      { scope = "local", win = self.winid }
+    )
+  end)
 end
 
 ---@private
