@@ -81,6 +81,7 @@ function ResultUI:on_call_state_changed(data)
 
   -- update the current call with up to date details
   self.current_call = call
+  vim.print("call state changed: " .. call.state)
   self:display_winbar()
 
   -- perform action based on the state
@@ -221,9 +222,20 @@ function ResultUI:display_winbar(length)
 
     local seconds = self.current_call.time_taken_us / 1000000
 
+    local end_statuses = { "archived", "executing_failed", "retrieving_failed", "unknown", "archive_failed" }
+    local load_indicator = vim.tbl_contains(end_statuses, self.current_call.state) and "" or "󰾞"
+
     vim.api.nvim_set_option_value(
       "winbar",
-      string.format("%d/%d (%d)%%=Took %.3fs", self.page_index + 1, self.page_ammount + 1, length, seconds),
+      string.format(
+        "  %s%d/%d (%s%d)%%=Took %.3fs  ",
+        load_indicator,
+        self.page_index + 1,
+        self.page_ammount + 1,
+        load_indicator,
+        length,
+        seconds
+      ),
       { scope = "local", win = self.winid }
     )
   end)
