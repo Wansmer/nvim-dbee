@@ -81,7 +81,6 @@ function ResultUI:on_call_state_changed(data)
 
   -- update the current call with up to date details
   self.current_call = call
-  vim.print("call state changed: " .. call.state)
   self:display_winbar()
 
   -- perform action based on the state
